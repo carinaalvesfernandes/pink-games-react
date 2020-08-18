@@ -1,0 +1,13 @@
+.status-bar {
+  display: flex;
+  align-items: center;
+}
+
+.status {
+  flex: 1; /*take the rest of the space*/
+  margin: 0;
+}
+
+.button {
+  flex: 0; /*take so lite space as possible*/
+}
