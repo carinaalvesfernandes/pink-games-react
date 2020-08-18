@@ -1,8 +1,10 @@
 var path = require("path");
 var HtmlWebpackPlugin = require("html-webpack-plugin");
 
+// Läs mer om hur man tänker här
+
 module.exports = {
-  entry: "./src/index.js",
+  entry: "./src/index.js", // detta skapar dist mappen
   output: {
     path: path.resolve(__dirname, "dist"),
     filename: "main.js",
