@@ -4,6 +4,7 @@
 }
 
 .memory-grid {
+  margin-top: 1vw;
   height: 40vw;
   display: grid;
   grid-template-rows: repeat(4, auto); /* how wide the rows should be*/
