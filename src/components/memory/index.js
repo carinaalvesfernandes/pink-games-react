@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./index.css";
 import StatusBar from "./StatusBar";
 import MemoryCard from "./MemoryCard";
@@ -46,12 +46,40 @@ function flipCard(cards, cardToFlip) {
   });
 }
 
+/*
+const intervallID = setInterval(() => console.log(Date.now()), 1000); //1000 ms is how often should this function run
+clearinterval(intervallID); // rensar intervallen men behöver ett ID
+*/
+
 function Memory() {
   const [game, setGame] = useState({
     cards: generateCards(),
     fristCard: undefined,
     secondCard: undefined,
   });
+
+  const [startTime, SetstartTime] = useState(0); // state variable
+  const [elapsedTime, SetElapsedTime] = useState(0);
+
+  // useState (<effect function>,<dependency array> -optional)
+  // <dependency array>:
+  //* undefiend : effect function will run after every render.
+  // * []: effect will run only on the firt render
+  // * [value1,value2]: effect will run when any of the values change
+  //effect function returns a cleanup function(-optional)
+  //that runs next time the effect functions is run or
+  // when the component unmounts (disappers from the DOM)
+
+  useEffect(() => {
+    if (startTime !== 0) {
+      const intervalID = setInterval(() => {
+        SetElapsedTime(Date.now() - startTime);
+      }, 1000);
+      return () => clearInterval(intervalID); // this is for cleaning up
+    }
+  }, [startTime]);
+
+  // this only happens on the first  render
 
   // useState generar två element i en array, därför skapar vi en array med två index, cards och setCards
   /* useState takes a parameter for the initial value of the state. 
@@ -83,7 +111,7 @@ function Memory() {
       if (!firstCard) {
         // the same as firstCard === "undefiend
 
-        return { cards: newCard, firstCard: card };
+        return { cards: newCard, firstCard: card }; // eftersom secondcard är undefiend behöver vi inte returna den
       }
       // 2. Else, if firstCard is defined, but secondCard isn't =>
       // we should flip the clicked card, keep the firstCard as is, but set the secondCard =>
@@ -104,13 +132,17 @@ function Memory() {
       // we should also set the new firstCard and remove secondCard from the state
       else {
         console.log("not the same");
-        let newCard2 = flipCard(newCard, firstCard);
+        let newCard2 = flipCard(newCard, firstCard); // vi flippar både firstcard och secondcard till deck newCard2
         newCard2 = flipCard(newCard2, secondCard);
 
         return { cards: newCard2, firstCard: card };
         // firstCard tilldelas den tredje klickade kortet eftersom first och second inte var en match
       }
     });
+
+    SetstartTime((oldStartTime) =>
+      oldStartTime === 0 ? Date.now() : oldStartTime
+    );
   }
 
   function onRestart() {
@@ -119,13 +151,18 @@ function Memory() {
       fristCard: undefined,
       secondCard: undefined,
     });
+    SetstartTime(0);
+    SetElapsedTime(0);
   }
 
   // I return är html kod, men om du vill lägga till javascript kod måste det vara inne i {}
 
   return (
     <div className="game-container">
-      <StatusBar status="Time: 0s" onRestart={onRestart}></StatusBar>
+      <StatusBar
+        status={`Time: ${elapsedTime} ms`}
+        onRestart={onRestart}
+      ></StatusBar>
       <div className="memory-grid">
         {game.cards.map((card) => (
           <MemoryCard
