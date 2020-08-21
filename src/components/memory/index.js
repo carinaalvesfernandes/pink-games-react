@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import "./index.css";
-import StatusBar from "./StatusBar";
+import StatusBar from "../StatusBar";
 import MemoryCard from "./MemoryCard";
 import * as utils from "../../utils"; // * betyder ALLT
+import ResultModal from "../ResultModal";
 
 const colors = [
   "pink",
@@ -66,6 +67,7 @@ function Memory() {
   const [startTime, SetstartTime] = useState(0); // state variable
   const [elapsedTime, SetElapsedTime] = useState(0);
   const [win, SetWin] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   // useState (<effect function>,<dependency array> -optional)
   // <dependency array>:
@@ -88,14 +90,7 @@ function Memory() {
 
   useEffect(() => {
     if (win) {
-      utils
-        .saveScore("memory", {
-          name: "Nelson",
-          timeMs: elapsedTime,
-        })
-        .then(() => console.log("Score saved"))
-        .then(() => utils.fetchLeaderboard("memory"))
-        .then((leaderboard) => console.log(leaderboard));
+      setShowModal(true);
     }
   }, [win]);
 
@@ -181,6 +176,20 @@ function Memory() {
     SetWin(false);
   }
 
+  function fetchLeaderboard() {
+    return utils
+      .fetchLeaderboard("memory", [["timeMs", "asc"]])
+      .then((leaderboard) =>
+        leaderboard.map(
+          (score, i) => `${i + 1}. ${score.name}: ${score.timeMs}ms`
+        )
+      ); // this is a promise
+  }
+
+  function saveScore(name, timeMs) {
+    utils.saveScore("memory", { name, timeMs }); // skapar en obecjt med namn och timeMs, genväg istället för att skriva name:name,timeMs:timeMs
+  }
+
   // I return är html kod, men om du vill lägga till javascript kod måste det vara inne i {}
 
   return (
@@ -200,6 +209,14 @@ function Memory() {
           // eftersom den inte har något innehåll i elementet går det att skriva såhär som en shortcut
         ))}
       </div>
+      <ResultModal
+        show={showModal}
+        handleClose={() => setShowModal(false)} // varför behöver jag skriva så och inte setShowModel(false)?  det är för att vi har en onclick function. functionen retunerar inget och därför behövs det skriva så(jag tror)
+        header={"Congratulations, you won!"}
+        body={"Your time was " + elapsedTime + "ms"}
+        fetchLeaderboard={fetchLeaderboard}
+        saveScore={(name) => saveScore(name, elapsedTime)}
+      ></ResultModal>
     </div>
   );
 }

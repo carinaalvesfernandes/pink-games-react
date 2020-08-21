@@ -5,16 +5,23 @@ import "firebase/firestore";
 /**
  * Returns a promise holding an array of our score objects
  * game parameter is eithet "memory", "snake" or "minesweeper(collection ID)"
- *
+ * orderby is a array containng sorting instructions like:
+ * [["score", "desc], ["timeMs", "asc"]]
  */
 
-export function fetchLeaderboard(game) {
+export function fetchLeaderboard(game, orderBy) {
   // detta finns doumenterat i firebase
   const auth = firebase.auth();
   const db = firebase.firestore();
   return auth
     .signInAnonymously() // async function
-    .then(() => db.collection(game).orderBy("timeMs", "asc").get()) // call this when the signin is done
+    .then(() => {
+      let query = db.collection(game);
+      orderBy.forEach((rule) => {
+        query = query.orderBy(...rule);
+      });
+      return query.limit(10).get();
+    }) // call this when the signin is done
     .then((querySnapshot) => {
       // and then do this.
       let leaderboard = [];
