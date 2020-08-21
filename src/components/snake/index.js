@@ -2,16 +2,33 @@ import React, { useState, useEffect } from "react";
 import "./index.css";
 import * as helpers from "./helpers.js";
 
-//const width = 20;
-//const height = 12;
+const width = 20;
+const height = 12;
 
 function Snake() {
   const [game, setGame] = useState(helpers.generateGame());
+  const [gameOver, setGameOver] = useState(false);
 
+  // om jag har svårt med useEffect skriv ner den tabellen om hur useEffect fungerar
   useEffect(() => {
-    const intervallID = setInterval(() => setGame(helpers.tick), 400);
+    if (gameOver) return; // om spelaren att förlorat så utförs inte Interval
+
+    const intervallID = setInterval(
+      () =>
+        setGame((oldGame) => {
+          const newGame = helpers.tick(oldGame);
+          if (helpers.isGameOver(newGame)) {
+            setGameOver(true);
+            console.log("try better next time");
+            return oldGame;
+          }
+
+          return newGame;
+        }),
+      400
+    );
     return () => clearInterval(intervallID);
-  }, []);
+  }, [gameOver]);
 
   useEffect(() => {
     console.log("now");

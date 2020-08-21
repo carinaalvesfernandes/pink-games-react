@@ -67,6 +67,7 @@ export function tick(oldGame) {
   let newFood = oldFood;
   // Wait a minute... if newHead has eaten the food, we should generate new food!
   // In that case, change newFood, use generateFood function.
+  // när snake äter man blir cellen där maten var den nya huvudet
   if (isEqual(oldFood, newHead)) newFood = generateFood(newSnake);
 
   return {
@@ -100,11 +101,14 @@ function generateNewHead(oldSnake) {
 function generateNewTail(oldSnake, oldFood, newHead) {
   // Create a variable newTail (an array). Its first cell should be the old snake's head
   // and the rest of the cells should be the old snake's tail. Use concat() function
-  // to add (append) a whole array to another array. Or you can use the [...myArray] syntax somehow... :)
-  // --> your code here
+  // to add (append) a whole array to another array.
+
   let newTail = [oldSnake.head];
   // concat does not mutate the obj but returns the result so it must saved in a variable
   newTail = newTail.concat(oldSnake.tail);
+  //*... spred*/
+  //lättare sätt att skriva samma kod:
+  newTail = [oldSnake.head, ...oldSnake.tail];
 
   if (!isEqual(newHead, oldFood)) {
     // does mutate
@@ -118,4 +122,16 @@ function generateNewTail(oldSnake, oldFood, newHead) {
   // Don't forget to return newTail!
   // --> your code here
   return newTail;
+}
+
+export function isGameOver(game) {
+  const snake = game.snake;
+  return (
+    isOutOfBounds(snake.head) ||
+    snake.tail.some((cell) => isEqual(cell, snake.head))
+  );
+}
+
+function isOutOfBounds(cell) {
+  return cell.x < 0 || cell.x >= width || cell.y < 0 || cell.y >= height;
 }
