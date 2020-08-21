@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import "./index.css";
 import * as helpers from "./helpers.js";
 
-const width = 20;
-const height = 12;
+//const width = 20;
+//const height = 12;
 
 function Snake() {
   const [game, setGame] = useState(helpers.generateGame());
