@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./index.css";
 import StatusBar from "./StatusBar";
 import MemoryCard from "./MemoryCard";
+import * as utils from "../../utils"; // * betyder ALLT
 
 const colors = [
   "pink",
@@ -52,6 +53,10 @@ clearinterval(intervallID); // rensar intervallen men behöver ett ID
 */
 
 function Memory() {
+  /*utils
+    .fetchLeaderboard("memory")
+    .then((leaderboard) => console.log(leaderboard));*/
+
   const [game, setGame] = useState({
     cards: generateCards(),
     fristCard: undefined,
@@ -60,6 +65,7 @@ function Memory() {
 
   const [startTime, SetstartTime] = useState(0); // state variable
   const [elapsedTime, SetElapsedTime] = useState(0);
+  const [win, SetWin] = useState(false);
 
   // useState (<effect function>,<dependency array> -optional)
   // <dependency array>:
@@ -71,13 +77,27 @@ function Memory() {
   // when the component unmounts (disappers from the DOM)
 
   useEffect(() => {
-    if (startTime !== 0) {
+    //This timer start when the startTime is NOT 0 AND win is false
+    if (startTime !== 0 && !win) {
       const intervalID = setInterval(() => {
         SetElapsedTime(Date.now() - startTime);
       }, 1000);
       return () => clearInterval(intervalID); // this is for cleaning up
     }
-  }, [startTime]);
+  }, [startTime, win]);
+
+  useEffect(() => {
+    if (win) {
+      utils
+        .saveScore("memory", {
+          name: "Nelson",
+          timeMs: elapsedTime,
+        })
+        .then(() => console.log("Score saved"))
+        .then(() => utils.fetchLeaderboard("memory"))
+        .then((leaderboard) => console.log(leaderboard));
+    }
+  }, [win]);
 
   // this only happens on the first  render
 
@@ -105,6 +125,7 @@ function Memory() {
 
     setGame(({ cards, firstCard, secondCard }) => {
       let newCard = flipCard(cards, card);
+      // change newCard to newCards
 
       // 1. If both firstCard and secondCard from the previous state are undefined =>
       // we should flip the clicked card and set it as the firstCard
@@ -118,12 +139,17 @@ function Memory() {
       else if (!secondCard) {
         // the same as (firstCard && !secondCard)
 
+        let isAllCardFlipped = newCard.every((card) => card.isFlipped);
+        if (isAllCardFlipped) {
+          SetWin(true);
+          console.log("You are the best!");
+        }
+
         return { cards: newCard, firstCard, secondCard: card };
       }
       // 3. Else, if the previous two clicked cards have the same color =>
       // we should flip the clicked card, set the new firstCard and remove secondCard from the state
       else if (firstCard.color === secondCard.color) {
-        console.log("the same");
         secondCard = undefined;
         return { cards: newCard, firstCard: card, secondCard };
       }
@@ -131,7 +157,6 @@ function Memory() {
       // we should flip the clicked card and flip back firstCard and secondCard,
       // we should also set the new firstCard and remove secondCard from the state
       else {
-        console.log("not the same");
         let newCard2 = flipCard(newCard, firstCard); // vi flippar både firstcard och secondcard till deck newCard2
         newCard2 = flipCard(newCard2, secondCard);
 
@@ -153,6 +178,7 @@ function Memory() {
     });
     SetstartTime(0);
     SetElapsedTime(0);
+    SetWin(false);
   }
 
   // I return är html kod, men om du vill lägga till javascript kod måste det vara inne i {}
