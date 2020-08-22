@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./index.css";
 import StatusBar from "../StatusBar";
 import MemoryCard from "./MemoryCard";
@@ -25,7 +25,9 @@ function Memory() {
   const [startTime, setstartTime] = useState(0); // state variable
   const [elapsedTime, setElapsedTime] = useState(0);
   const [win, setWin] = useState(false);
-  const [showModal, setShowModal] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [wrongPair, setWrongPair] = useState(null);
+  const timeoutIds = useRef([]);
 
   // useState (<effect function>,<dependency array> -optional)
   // <dependency array>:
@@ -52,6 +54,28 @@ function Memory() {
     }
   }, [win]);
 
+  useEffect(() => {
+    if (!wrongPair) return;
+    const timeoutId = setTimeout(() => {
+      setGame((oldGame) => {
+        return {
+          ...oldGame,
+          cards: helpers.flipCards(
+            oldGame.cards,
+            wrongPair.map((card) => card.key)
+          ),
+        };
+      });
+    }, 1000);
+    timeoutIds.current = timeoutIds.current.concat(timeoutId);
+  }, [wrongPair]);
+
+  useEffect(() => {
+    return () => {
+      timeoutIds.forEach((id) => clearTimeout(id));
+    };
+  }, []);
+
   // this only happens on the first  render
 
   // useState generar två element i en array, därför skapar vi en array med två index, cards och setCards
@@ -74,7 +98,7 @@ function Memory() {
 
   function onCardClick(card) {
     setGame((oldGame) =>
-      helpers.calculateNewGame(oldGame, card, () => setWin(true))
+      helpers.calculateNewGame(oldGame, card, () => setWin(true), setWrongPair)
     );
 
     setstartTime((oldStartTime) =>
@@ -98,7 +122,7 @@ function Memory() {
   return (
     <div className="game-container">
       <StatusBar
-        status={`Time: ${elapsedTime} ms`}
+        status={`Time: ${utils.prettifyTime(elapsedTime)}`}
         onRestart={onRestart}
       ></StatusBar>
       <div className="memory-grid">
@@ -116,7 +140,7 @@ function Memory() {
         show={showModal}
         handleClose={() => setShowModal(false)} // varför behöver jag skriva så och inte setShowModel(false)?  det är för att vi har en onclick function. functionen retunerar inget och därför behövs det skriva så(jag tror)
         header={"Congratulations, you won!"}
-        body={"Your time was " + elapsedTime + "ms"}
+        body={`Your time was ${utils.prettifyTime(elapsedTime)}.`}
         fetchLeaderboard={helpers.fetchLeaderboard}
         saveScore={(name) => helpers.saveScore(name, elapsedTime)}
       ></ResultModal>

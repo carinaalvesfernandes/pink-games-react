@@ -30,64 +30,54 @@ export function generateCards() {
 }
 
 /* 
-  Returns a new array of cards where the specified card (cardToFlip)
+  Returns a new array of cards where the specified card (keysToFlip)
   will have a different value of its isFlipped: true changes to false and false to true.
+  keysToFlip = cardsToFlipp
   */
 
-function flipCard(cards, cardToFlip) {
+export function flipCards(cards, keysToFlip) {
   return cards.map((card) => {
-    if (card.key === cardToFlip.key) {
-      return { ...card, isFlipped: !card.isFlipped };
-    }
-    return card;
+    return {
+      ...card,
+      isFlipped: keysToFlip.includes(card.key)
+        ? !card.isFlipped
+        : card.isFlipped,
+    };
   });
 }
+
 export function calculateNewGame(
-  { cards, firstCard, secondCard },
-  card,
-  onGameWon
+  { cards, firstCard },
+  clickedCard,
+  onGameWon,
+  setWrongPair
 ) {
   // If the card is already flipped there is nothing we need to do (write an if-statement with a return; inside)
-  if (card.isFlipped) return { cards, firstCard, secondCard };
+  if (clickedCard.isFlipped) return { cards, firstCard };
 
-  let newCard = flipCard(cards, card);
-  // change newCard to newCards
+  const newCards = flipCards(cards, [clickedCard.key]);
+  const isCardFlipped = (card) => card.isFlipped;
 
-  // 1. If both firstCard and secondCard from the previous state are undefined =>
+  // 1. If both firstCard from the previous state are undefined =>
   // we should flip the clicked card and set it as the firstCard
   if (!firstCard) {
     // the same as firstCard === "undefiend
 
-    return { cards: newCard, firstCard: card }; // eftersom secondcard är undefiend behöver vi inte returna den
+    return { cards: newCards, firstCard: clickedCard };
   }
+
   // 2. Else, if firstCard is defined, but secondCard isn't =>
   // we should flip the clicked card, keep the firstCard as is, but set the secondCard =>
-  else if (!secondCard) {
-    // the same as (firstCard && !secondCard)
-
-    let isAllCardFlipped = newCard.every((card) => card.isFlipped);
-    if (isAllCardFlipped) {
-      onGameWon();
-      console.log("You are the best!");
-    }
-
-    return { cards: newCard, firstCard, secondCard: card };
-  }
-  // 3. Else, if the previous two clicked cards have the same color =>
-  // we should flip the clicked card, set the new firstCard and remove secondCard from the state
-  else if (firstCard.color === secondCard.color) {
-    secondCard = undefined;
-    return { cards: newCard, firstCard: card, secondCard };
-  }
-  // 4. Else, if the previous two clicked cards have different colors =>
-  // we should flip the clicked card and flip back firstCard and secondCard,
-  // we should also set the new firstCard and remove secondCard from the state
   else {
-    let newCard2 = flipCard(newCard, firstCard); // vi flippar både firstcard och secondcard till deck newCard2
-    newCard2 = flipCard(newCard2, secondCard);
-
-    return { cards: newCard2, firstCard: card };
-    // firstCard tilldelas den tredje klickade kortet eftersom first och second inte var en match
+    if (firstCard.color !== clickedCard.color) {
+      setWrongPair([firstCard, clickedCard]);
+    }
+    if (newCards.every(isCardFlipped)) {
+      onGameWon();
+    }
+    return {
+      cards: newCards,
+    };
   }
 }
 
@@ -96,7 +86,8 @@ export function fetchLeaderboard() {
     .fetchLeaderboard("memory", [["timeMs", "asc"]])
     .then((leaderboard) =>
       leaderboard.map(
-        (score, i) => `${i + 1}. ${score.name}: ${score.timeMs}ms`
+        (score, i) =>
+          `${i + 1}. ${score.name}: ${utils.prettifyTime(score.timeMs)}`
       )
     ); // this is a promise
 }
