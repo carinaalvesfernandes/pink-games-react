@@ -10,6 +10,8 @@ import "firebase/firestore";
  */
 
 export function fetchLeaderboard(game, orderBy) {
+  console.log("fetching leaderboard");
+
   // detta finns doumenterat i firebase
   const auth = firebase.auth();
   const db = firebase.firestore();
