@@ -139,7 +139,7 @@ function Memory() {
       <ResultModal
         show={showModal}
         handleClose={() => setShowModal(false)} // varför behöver jag skriva så och inte setShowModel(false)?  det är för att vi har en onclick function. functionen retunerar inget och därför behövs det skriva så(jag tror)
-        header={"Congratulations, you won!"}
+        header={"Congratulations, you won!!!!"}
         body={`Your time was ${utils.prettifyTime(elapsedTime)}.`}
         fetchLeaderboard={helpers.fetchLeaderboard}
         saveScore={(name) => helpers.saveScore(name, elapsedTime)}
