@@ -18,11 +18,13 @@ export function generateCards() {
       key: i * 2,
       color: colors[i],
       isFlipped: false,
+      isMatched: false,
     });
     cards.push({
       key: i * 2 + 1,
       color: colors[i],
       isFlipped: false,
+      isMatched: false,
     });
   }
   cards.sort(() => Math.random() - 0.5); // shuffle algoritm
@@ -46,6 +48,15 @@ export function flipCards(cards, keysToFlip) {
   });
 }
 
+export function lockCards(cards, keysToLock) {
+  return cards.map((card) => {
+    return {
+      ...card,
+      isMatched: keysToLock.includes(card.key) ? true : card.isMatched,
+    };
+  });
+}
+
 export function calculateNewGame(
   { cards, firstCard },
   clickedCard,
@@ -55,8 +66,7 @@ export function calculateNewGame(
   // If the card is already flipped there is nothing we need to do (write an if-statement with a return; inside)
   if (clickedCard.isFlipped) return { cards, firstCard };
 
-  const newCards = flipCards(cards, [clickedCard.key]);
-  const isCardFlipped = (card) => card.isFlipped;
+  let newCards = flipCards(cards, [clickedCard.key]);
 
   // 1. If both firstCard from the previous state are undefined =>
   // we should flip the clicked card and set it as the firstCard
@@ -71,8 +81,10 @@ export function calculateNewGame(
   else {
     if (firstCard.color !== clickedCard.color) {
       setWrongPair([firstCard, clickedCard]);
+    } else {
+      newCards = lockCards(newCards, [clickedCard.key, firstCard.key]);
     }
-    if (newCards.every(isCardFlipped)) {
+    if (newCards.every((card) => card.isMatched)) {
       onGameWon();
     }
     return {

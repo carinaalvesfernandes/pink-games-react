@@ -27,7 +27,7 @@ function Memory() {
   const [win, setWin] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [wrongPair, setWrongPair] = useState(null);
-  const timeoutIds = useRef([]);
+  const timeoutIds = useRef([]); // typ some useState men componeten renderas inte när den uppdataeras.
 
   // useState (<effect function>,<dependency array> -optional)
   // <dependency array>:
@@ -72,7 +72,7 @@ function Memory() {
 
   useEffect(() => {
     return () => {
-      timeoutIds.forEach((id) => clearTimeout(id));
+      timeoutIds.current.forEach((id) => clearTimeout(id));
     };
   }, []);
 
