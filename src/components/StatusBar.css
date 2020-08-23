@@ -10,4 +10,5 @@
 
 .button {
   flex: 0; /*take so lite space as possible*/
+  margin-left: 5px;
 }

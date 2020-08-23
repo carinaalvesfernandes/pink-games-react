@@ -28,6 +28,7 @@ function Memory() {
   const [showModal, setShowModal] = useState(false);
   const [wrongPair, setWrongPair] = useState(null);
   const timeoutIds = useRef([]); // typ some useState men componeten renderas inte när den uppdataeras.
+  const [scoreCanBeSaved, setScoreCanBeSaved] = useState(false);
 
   // useState (<effect function>,<dependency array> -optional)
   // <dependency array>:
@@ -51,6 +52,7 @@ function Memory() {
   useEffect(() => {
     if (win) {
       setShowModal(true);
+      setScoreCanBeSaved(true);
     }
   }, [win]);
 
@@ -115,6 +117,7 @@ function Memory() {
     setstartTime(0);
     setElapsedTime(0);
     setWin(false);
+    setScoreCanBeSaved(false);
   }
 
   // I return är html kod, men om du vill lägga till javascript kod måste det vara inne i {}
@@ -124,6 +127,7 @@ function Memory() {
       <StatusBar
         status={`Time: ${utils.prettifyTime(elapsedTime)}`}
         onRestart={onRestart}
+        onShowLeaderboard={() => setShowModal(true)}
       ></StatusBar>
       <div className="memory-grid">
         {game.cards.map((card) => (
@@ -139,10 +143,15 @@ function Memory() {
       <ResultModal
         show={showModal}
         handleClose={() => setShowModal(false)} // varför behöver jag skriva så och inte setShowModel(false)?  det är för att vi har en onclick function. functionen retunerar inget och därför behövs det skriva så(jag tror)
-        header={"Congratulations, you won!!!!"}
-        body={`Your time was ${utils.prettifyTime(elapsedTime)}.`}
+        header={win ? "Congratulations, you won!" : "Leaderboard"}
+        body={win ? `Your time was ${utils.prettifyTime(elapsedTime)}.` : ""}
         fetchLeaderboard={helpers.fetchLeaderboard}
-        saveScore={(name) => helpers.saveScore(name, elapsedTime)}
+        saveScore={(name) =>
+          helpers
+            .saveScore(name, elapsedTime)
+            .then(() => setScoreCanBeSaved(false))
+        } // i en then ska det alltid vara en function
+        scoreCanBeSaved={scoreCanBeSaved}
       ></ResultModal>
     </div>
   );
