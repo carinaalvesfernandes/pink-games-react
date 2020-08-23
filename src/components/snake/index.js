@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from "react";
 import "./index.css";
 import * as helpers from "./helpers.js";
-
-const width = 20;
-const height = 12;
+import StatusBar from "../StatusBar";
+import ResultModal from "../ResultModal";
+import * as utils from "../../utils";
 
 function Snake() {
   const [game, setGame] = useState(helpers.generateGame());
   const [gameOver, setGameOver] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [scoreCanBeSaved, setScoreCanBeSaved] = useState(false);
+  const [startTime, setStartTime] = useState(Date.now());
+  const [elapsedTime, setElapsedTime] = useState(0);
 
   // om jag har svårt med useEffect skriv ner den tabellen om hur useEffect fungerar
   useEffect(() => {
@@ -19,6 +23,8 @@ function Snake() {
           const newGame = helpers.tick(oldGame);
           if (helpers.isGameOver(newGame)) {
             setGameOver(true);
+            setScoreCanBeSaved(true);
+            setShowModal(true);
             console.log("try better next time");
             return oldGame;
           }
@@ -35,6 +41,15 @@ function Snake() {
     window.addEventListener("keydown", handleKeyPress);
     return () => window.removeEventListener("keydown", handleKeyPress);
   }, []);
+
+  useEffect(() => {
+    if (!gameOver) {
+      const intervalId = setInterval(() => {
+        setElapsedTime(Date.now() - startTime);
+      }, 100);
+      return () => clearInterval(intervalId);
+    }
+  }, [gameOver, startTime]);
 
   function handleKeyPress(event) {
     let newDir;
@@ -65,9 +80,17 @@ function Snake() {
     }
   }
 
+  function onRestart() {
+    setGame(helpers.generateGame());
+    setGameOver(false);
+    setScoreCanBeSaved(false);
+    setElapsedTime(0);
+    setStartTime(Date.now());
+  }
+
   const cells = [];
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
+  for (let y = 0; y < helpers.height; y++) {
+    for (let x = 0; x < helpers.width; x++) {
       const cell = { x, y }; // när namen är samma som value går det att skriva så. Det är samma som {x:x ,y:y}
       let className = "";
       if (helpers.isEqual(cell, game.snake.head)) {
@@ -88,7 +111,26 @@ function Snake() {
 
   return (
     <div className="game-container">
+      <StatusBar
+        status1={`Score: ${helpers.getScore(game)}`}
+        status2={`Time: ${utils.prettifyTime(elapsedTime)}`}
+        onRestart={onRestart}
+        onShowLeaderboard={() => setShowModal(true)}
+      ></StatusBar>
       <div className="snake-grid">{cells}</div>
+      <ResultModal
+        show={showModal}
+        handleClose={() => setShowModal(false)} // varför behöver jag skriva så och inte setShowModel(false)?  det är för att vi har en onclick function. functionen retunerar inget och därför behövs det skriva så(jag tror)
+        header={gameOver ? "Game Over" : "Leaderboard"}
+        body={gameOver ? `Your score was ${helpers.getScore(game)}.` : ""}
+        fetchLeaderboard={helpers.fetchLeaderboard}
+        saveScore={(name) =>
+          helpers
+            .saveScore(name, helpers.getScore(game), elapsedTime)
+            .then(() => setScoreCanBeSaved(false))
+        } // i en then ska det alltid vara en function
+        scoreCanBeSaved={scoreCanBeSaved}
+      ></ResultModal>
     </div>
   );
 }

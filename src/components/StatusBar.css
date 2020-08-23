@@ -4,8 +4,13 @@
 }
 
 .status {
-  flex: 1; /*take the rest of the space*/
   margin: 0;
+  font-weight: 600;
+}
+
+.status-container {
+  flex: 1;
+  margin-bottom: 0rem;
 }
 
 .button {

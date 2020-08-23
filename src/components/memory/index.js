@@ -29,6 +29,7 @@ function Memory() {
   const [wrongPair, setWrongPair] = useState(null);
   const timeoutIds = useRef([]); // typ some useState men componeten renderas inte när den uppdataeras.
   const [scoreCanBeSaved, setScoreCanBeSaved] = useState(false);
+  const [clickDisabled, setClickDisabled] = useState(false);
 
   // useState (<effect function>,<dependency array> -optional)
   // <dependency array>:
@@ -58,6 +59,7 @@ function Memory() {
 
   useEffect(() => {
     if (!wrongPair) return;
+    setClickDisabled(true);
     const timeoutId = setTimeout(() => {
       setGame((oldGame) => {
         return {
@@ -68,6 +70,7 @@ function Memory() {
           ),
         };
       });
+      setClickDisabled(false);
     }, 1000);
     timeoutIds.current = timeoutIds.current.concat(timeoutId);
   }, [wrongPair]);
@@ -99,6 +102,7 @@ function Memory() {
   }*/
 
   function onCardClick(card) {
+    if (clickDisabled) return;
     setGame((oldGame) =>
       helpers.calculateNewGame(oldGame, card, () => setWin(true), setWrongPair)
     );
@@ -125,7 +129,7 @@ function Memory() {
   return (
     <div className="game-container">
       <StatusBar
-        status={`Time: ${utils.prettifyTime(elapsedTime)}`}
+        status1={`Time: ${utils.prettifyTime(elapsedTime)}`}
         onRestart={onRestart}
         onShowLeaderboard={() => setShowModal(true)}
       ></StatusBar>

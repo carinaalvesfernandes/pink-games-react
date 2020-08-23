@@ -1,4 +1,5 @@
 // not a componet thats why not big letter, its a helper functions file
+import * as utils from "../../utils";
 
 export const width = 20;
 export const height = 12;
@@ -134,4 +135,26 @@ export function isGameOver(game) {
 
 function isOutOfBounds(cell) {
   return cell.x < 0 || cell.x >= width || cell.y < 0 || cell.y >= height;
+}
+
+export const getScore = (game) => game.snake.tail.length - 1;
+
+export function fetchLeaderboard() {
+  return utils
+    .fetchLeaderboard("snake", [
+      ["score", "desc"],
+      ["timeMs", "asc"],
+    ])
+    .then((leaderboard) =>
+      leaderboard.map(
+        (score, i) =>
+          `${i + 1}. ${score.name}: ${score.score}, ${utils.prettifyTime(
+            score.timeMs
+          )}`
+      )
+    ); // this is a promise
+}
+
+export function saveScore(name, score, timeMs) {
+  return utils.saveScore("snake", { name, score, timeMs }); // skapar en obecjt med namn och timeMs, genväg istället för att skriva name:name,timeMs:timeMs
 }
