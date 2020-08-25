@@ -3,6 +3,7 @@ import "./index.css";
 import * as helpers from "./helpers.js";
 import StatusBar from "../StatusBar";
 import ResultModal from "../ResultModal";
+import TouchController from "./TouchController";
 import * as utils from "../../utils";
 
 function Snake() {
@@ -80,6 +81,18 @@ function Snake() {
     }
   }
 
+  function setDir(dir) {
+    setGame((oldGame) => {
+      return {
+        ...oldGame,
+        snake: {
+          ...oldGame.snake,
+          dir,
+        },
+      };
+    });
+  }
+
   function onRestart() {
     setGame(helpers.generateGame());
     setGameOver(false);
@@ -118,6 +131,7 @@ function Snake() {
         onShowLeaderboard={() => setShowModal(true)}
       ></StatusBar>
       <div className="snake-grid">{cells}</div>
+      <TouchController onChangeDir={setDir} />
       <ResultModal
         show={showModal}
         handleClose={() => setShowModal(false)} // varför behöver jag skriva så och inte setShowModel(false)?  det är för att vi har en onclick function. functionen retunerar inget och därför behövs det skriva så(jag tror)

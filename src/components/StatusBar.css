@@ -11,6 +11,7 @@
 .status-container {
   flex: 1;
   margin-bottom: 0rem;
+  font-size: 0.9em;
 }
 
 .button {
