@@ -76,19 +76,16 @@ function Snake() {
     if (newDir) {
       console.log(newDir);
       setGame((oldGame) => {
-        return { ...oldGame, snake: { ...oldGame.snake, dir: newDir } };
+        return { ...oldGame, commands: [...oldGame.commands, newDir] };
       });
     }
   }
 
-  function setDir(dir) {
+  function addCommand(dir) {
     setGame((oldGame) => {
       return {
         ...oldGame,
-        snake: {
-          ...oldGame.snake,
-          dir,
-        },
+        commands: [...oldGame.commands, dir],
       };
     });
   }
@@ -131,7 +128,7 @@ function Snake() {
         onShowLeaderboard={() => setShowModal(true)}
       ></StatusBar>
       <div className="snake-grid">{cells}</div>
-      <TouchController onChangeDir={setDir} />
+      <TouchController onChangeDir={addCommand} />
       <ResultModal
         show={showModal}
         handleClose={() => setShowModal(false)} // varför behöver jag skriva så och inte setShowModel(false)?  det är för att vi har en onclick function. functionen retunerar inget och därför behövs det skriva så(jag tror)

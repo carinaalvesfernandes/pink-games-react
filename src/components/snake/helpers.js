@@ -22,6 +22,7 @@ export function generateGame() {
   return {
     snake: snake,
     food: generateFood(snake),
+    commands: [],
   };
 }
 
@@ -49,54 +50,67 @@ function random(max) {
   return Math.floor(Math.random() * max);
 }
 
-// Generates a new gamestate depending on the previous game state
-export function tick(oldGame) {
-  const oldSnake = oldGame.snake;
-  const oldFood = oldGame.food;
+export function tick(game) {
+  const { snake, food, commands } = game; // tror att det är samma som const snake = game.snake;
 
-  const newHead = generateNewHead(oldSnake);
-  const newTail = generateNewTail(oldSnake, oldFood, newHead);
+  let newCommands = [...commands];
+
+  /**
+   * kollar ifall arrayen innehåller mer än 0 elements.
+   * och  ifall första index i array newCommands är mottsatt till snake.dir eller ifall det är samma innehåll tas (index/elementet)den  bort ifrån arrayen.
+   */
+  while (
+    newCommands.length > 0 &&
+    (isOpposite(newCommands[0], snake.dir) || newCommands[0] === snake.dir)
+  ) {
+    newCommands = newCommands.slice(1);
+  }
+
+  // ifall allt stämmer  tilldelas newDir samma innehåll som arrayen newCommands första index, sedan tas den bort ifån arrayen
+  let newDir = snake.dir;
+  if (newCommands.length > 0) {
+    newDir = newCommands[0];
+    newCommands = newCommands.slice(1);
+  }
+
+  let newHead;
+  switch (newDir) {
+    case "right":
+      newHead = { x: snake.head.x + 1, y: snake.head.y };
+      break;
+    case "down":
+      newHead = { x: snake.head.x, y: snake.head.y + 1 };
+      break;
+    case "left":
+      newHead = { x: snake.head.x - 1, y: snake.head.y };
+      break;
+    case "up":
+      newHead = { x: snake.head.x, y: snake.head.y - 1 };
+      break;
+  }
+
+  const newTail = generateNewTail(snake, food, newHead);
   const newSnake = {
-    ...oldSnake,
+    ...snake,
     head: newHead,
     tail: newTail,
+    dir: newDir,
   };
 
   // oldsnake is in the old posistion
   // the newSnake is the new Snake posistion that's why whe send the newSnake.
 
-  let newFood = oldFood;
-  // Wait a minute... if newHead has eaten the food, we should generate new food!
-  // In that case, change newFood, use generateFood function.
   // när snake äter man blir cellen där maten var den nya huvudet
-  if (isEqual(oldFood, newHead)) newFood = generateFood(newSnake);
+  //kan skrivas direkt till return statement istället
+  /*let newFood = food;
+  if (isEqual(food, newHead)) newFood = generateFood(newSnake);*/
 
   return {
+    ...game,
     snake: newSnake,
-    food: newFood,
+    food: isEqual(newHead, food) ? generateFood(newSnake) : food,
+    commands: newCommands,
   };
-}
-
-function generateNewHead(oldSnake) {
-  let newHead;
-  switch (oldSnake.dir) {
-    case "right":
-      newHead = { x: oldSnake.head.x + 1, y: oldSnake.head.y };
-      break;
-    case "down":
-      // newHead = ???
-      newHead = { x: oldSnake.head.x, y: oldSnake.head.y + 1 };
-      break;
-    case "left":
-      // newHead = ???
-      newHead = { x: oldSnake.head.x - 1, y: oldSnake.head.y };
-      break;
-    case "up":
-      // newHead = ???
-      newHead = { x: oldSnake.head.x, y: oldSnake.head.y - 1 };
-      break;
-  }
-  return newHead;
 }
 
 function generateNewTail(oldSnake, oldFood, newHead) {
@@ -115,14 +129,16 @@ function generateNewTail(oldSnake, oldFood, newHead) {
     // does mutate
     newTail.pop();
   }
-
-  // Now the snake's tail has become longer! We should keep it like that if the snake has eaten,
-  // otherwise we need to shorten it (remove the last element). Use the pop() function.
-  // --> your code here
-
-  // Don't forget to return newTail!
-  // --> your code here
   return newTail;
+}
+
+function isOpposite(dir1, dir2) {
+  return (
+    (dir1 === "left" && dir2 === "right") ||
+    (dir1 === "right" && dir2 === "left") ||
+    (dir1 === "up" && dir2 === "down") ||
+    (dir1 === "down" && dir2 === "up")
+  );
 }
 
 export function isGameOver(game) {
@@ -158,3 +174,51 @@ export function fetchLeaderboard() {
 export function saveScore(name, score, timeMs) {
   return utils.saveScore("snake", { name, score, timeMs }); // skapar en obecjt med namn och timeMs, genväg istället för att skriva name:name,timeMs:timeMs
 }
+
+// Generates a new gamestate depending on the previous game state
+/*export function tick(oldGame) {
+  const oldSnake = oldGame.snake;
+  const oldFood = oldGame.food;
+
+  const newHead = generateNewHead(oldSnake);
+  const newTail = generateNewTail(oldSnake, oldFood, newHead);
+  const newSnake = {
+    ...oldSnake,
+    head: newHead,
+    tail: newTail,
+  };
+
+  // oldsnake is in the old posistion
+  // the newSnake is the new Snake posistion that's why whe send the newSnake.
+
+  let newFood = oldFood;
+  // när snake äter man blir cellen där maten var den nya huvudet
+  if (isEqual(oldFood, newHead)) newFood = generateFood(newSnake);
+
+  return {
+    snake: newSnake,
+    food: newFood,
+  };
+}*/
+
+/*function generateNewHead(oldSnake) {
+  let newHead;
+  switch (oldSnake.dir) {
+    case "right":
+      newHead = { x: oldSnake.head.x + 1, y: oldSnake.head.y };
+      break;
+    case "down":
+      // newHead = ???
+      newHead = { x: oldSnake.head.x, y: oldSnake.head.y + 1 };
+      break;
+    case "left":
+      // newHead = ???
+      newHead = { x: oldSnake.head.x - 1, y: oldSnake.head.y };
+      break;
+    case "up":
+      // newHead = ???
+      newHead = { x: oldSnake.head.x, y: oldSnake.head.y - 1 };
+      break;
+  }
+  return newHead;
+}*/
