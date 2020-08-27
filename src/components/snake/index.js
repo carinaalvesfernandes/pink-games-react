@@ -13,6 +13,7 @@ function Snake() {
   const [scoreCanBeSaved, setScoreCanBeSaved] = useState(false);
   const [startTime, setStartTime] = useState(Date.now());
   const [elapsedTime, setElapsedTime] = useState(0);
+  const [intervalMs, setIntervalMs] = useState(helpers.initialIntervalMs);
 
   // om jag har svårt med useEffect skriv ner den tabellen om hur useEffect fungerar
   useEffect(() => {
@@ -29,13 +30,15 @@ function Snake() {
             console.log("try better next time");
             return oldGame;
           }
+          setIntervalMs(helpers.getIntervalMs(newGame.snake.tail.length));
+          console.log(intervalMs);
 
           return newGame;
         }),
-      400
+      intervalMs
     );
     return () => clearInterval(intervallID);
-  }, [gameOver]);
+  }, [gameOver, intervalMs]);
 
   useEffect(() => {
     console.log("now");

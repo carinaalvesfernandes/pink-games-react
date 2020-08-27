@@ -51,7 +51,7 @@ function random(max) {
 }
 
 export function tick(game) {
-  const { snake, food, commands } = game; // tror att det är samma som const snake = game.snake;
+  const { snake, food, commands, isOver } = game; // tror att det är samma som const snake = game.snake;
 
   let newCommands = [...commands];
 
@@ -107,6 +107,7 @@ export function tick(game) {
 
   return {
     ...game,
+    isOver: isGameOver(game),
     snake: newSnake,
     food: isEqual(newHead, food) ? generateFood(newSnake) : food,
     commands: newCommands,
@@ -173,6 +174,13 @@ export function fetchLeaderboard() {
 
 export function saveScore(name, score, timeMs) {
   return utils.saveScore("snake", { name, score, timeMs }); // skapar en obecjt med namn och timeMs, genväg istället för att skriva name:name,timeMs:timeMs
+}
+
+export const initialIntervalMs = 400;
+
+// Ökar takten med 10% på spelet efter varje tredje måltid
+export function getIntervalMs(tailLength) {
+  return initialIntervalMs * Math.pow(0.8, Math.floor((tailLength - 1) / 3));
 }
 
 // Generates a new gamestate depending on the previous game state
