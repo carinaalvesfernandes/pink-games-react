@@ -51,7 +51,7 @@ function random(max) {
 }
 
 export function tick(game) {
-  const { snake, food, commands, isOver } = game; // tror att det är samma som const snake = game.snake;
+  const { snake, food, commands } = game; // tror att det är samma som const snake = game.snake;
 
   let newCommands = [...commands];
 
@@ -107,7 +107,6 @@ export function tick(game) {
 
   return {
     ...game,
-    isOver: isGameOver(game),
     snake: newSnake,
     food: isEqual(newHead, food) ? generateFood(newSnake) : food,
     commands: newCommands,
