@@ -43,7 +43,7 @@ function calculateMines(grid, x, y) {
   return grid[y * width + x].isMine ? 1 : 0;
 }
 
-export function openCell(oldGrid, x, y) {
+/*export function openCell(oldGrid, x, y) {
   const newGrid = [];
   for (let i = 0; i < height * width; i++) {
     newGrid.push({
@@ -51,6 +51,31 @@ export function openCell(oldGrid, x, y) {
       isOpen: y * width + x === i ? true : oldGrid[i].isOpen,
       isMarked: y * width + x === i ? false : oldGrid[i].isMarked,
     });
+  }
+
+  return newGrid;
+}*/
+
+export function openCells(grid, x, y) {
+  if (x < 0 || y < 0 || x >= width || y >= height) return grid;
+
+  if (grid[y * width + x].isOpen) return grid;
+
+  let newGrid = grid.map((cell, i) => {
+    return i === y * width + x
+      ? { ...cell, isOpen: true, isMarked: false }
+      : cell;
+  });
+
+  if (!calculateMinesAround(newGrid, x, y)) {
+    newGrid = openCells(newGrid, x - 1, y - 1); // recursion
+    newGrid = openCells(newGrid, x, y - 1);
+    newGrid = openCells(newGrid, x + 1, y - 1);
+    newGrid = openCells(newGrid, x - 1, y);
+    newGrid = openCells(newGrid, x + 1, y);
+    newGrid = openCells(newGrid, x - 1, y + 1);
+    newGrid = openCells(newGrid, x, y + 1);
+    newGrid = openCells(newGrid, x + 1, y + 1);
   }
 
   return newGrid;
