@@ -1,3 +1,5 @@
+import * as utils from "../../utils";
+
 export const [width, height] = [10, 10];
 export const mines = 15;
 
@@ -41,6 +43,10 @@ function calculateMines(grid, x, y) {
     return 0;
   }
   return grid[y * width + x].isMine ? 1 : 0;
+}
+
+export function calculateMarkedCells(grid) {
+  return grid.filter((cell) => cell.isMarked).length;
 }
 
 /*export function openCell(oldGrid, x, y) {
@@ -104,7 +110,6 @@ export function openAllMines(oldGrid, x, y) {
       isOpen: oldGrid[i].isOpen || oldGrid[i].isMine, // if one of them is true
     });
   }
-
   return newGrid;
 }
 
@@ -112,4 +117,19 @@ export function isWin(grid) {
   return grid.every(
     (cell) => (cell.isMine ? cell.isMarked && !cell.isOpen : cell.isOpen) // om cell är mine då måste den vara marked OCH stängd. Är det ingen mine så måste den öppen
   );
+}
+
+export function fetchLeaderboard() {
+  return utils
+    .fetchLeaderboard("minesweeper", [["timeMs", "asc"]])
+    .then((leaderboard) =>
+      leaderboard.map(
+        (score, i) =>
+          `${i + 1}. ${score.name}: ${utils.prettifyTime(score.timeMs)}`
+      )
+    ); // this is a promise
+}
+
+export function saveScore(name, timeMs) {
+  return utils.saveScore("minesweeper", { name, timeMs }); // skapar en obecjt med namn och timeMs, genväg istället för att skriva name:name,timeMs:timeMs
 }
