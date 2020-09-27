@@ -27,3 +27,39 @@
 .purple {
   background-color: #a800ff;
 }
+
+.rm {
+  background-image: url(../../images/RM.jpg);
+}
+
+.jin {
+  background-image: url(../../images/JIN.jpg);
+}
+
+.suga {
+  background-image: url(../../images/SUGA.jpg);
+}
+
+.jhope {
+  background-image: url(../../images/JHOPE.jpg);
+}
+
+.jimin {
+  background-image: url(../../images/JIMIN.jpg);
+}
+
+.v {
+  background-image: url(../../images/V.jpg);
+}
+
+.jungkook {
+  background-image: url(../../images/JUNGKOOK.jpg);
+}
+
+.bts {
+  background-image: url(../../images/BTS.jpg);
+}
+
+.image {
+  background-size: cover;
+}

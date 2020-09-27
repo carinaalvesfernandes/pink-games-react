@@ -137,11 +137,10 @@ function Memory() {
         {game.cards.map((card) => (
           <MemoryCard
             key={card.key}
-            color={card.color}
+            image={card.image}
             isFlipped={card.isFlipped}
             onClick={() => onCardClick(card)}
-          />
-          // eftersom den inte har något innehåll i elementet går det att skriva såhär som en shortcut
+          /> // eftersom den inte har något innehåll i elementet går det att skriva såhär som en shortcut
         ))}
       </div>
       <ResultModal

@@ -11,18 +11,20 @@ const colors = [
   "purple",
 ];
 
+const images = ["rm", "jin", "suga", "jhope", "jimin", "v", "jungkook", "bts"];
+
 export function generateCards() {
   const cards = [];
   for (let i = 0; i < colors.length; i++) {
     cards.push({
       key: i * 2,
-      color: colors[i],
+      image: images[i],
       isFlipped: false,
       isMatched: false,
     });
     cards.push({
       key: i * 2 + 1,
-      color: colors[i],
+      image: images[i],
       isFlipped: false,
       isMatched: false,
     });
@@ -79,7 +81,7 @@ export function calculateNewGame(
   // 2. Else, if firstCard is defined, but secondCard isn't =>
   // we should flip the clicked card, keep the firstCard as is, but set the secondCard =>
   else {
-    if (firstCard.color !== clickedCard.color) {
+    if (firstCard.image !== clickedCard.image) {
       setWrongPair([firstCard, clickedCard]);
     } else {
       newCards = lockCards(newCards, [clickedCard.key, firstCard.key]);
