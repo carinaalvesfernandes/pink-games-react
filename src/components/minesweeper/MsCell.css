@@ -6,8 +6,9 @@
 }
 @media only screen and (orientation: portrait) {
   .ms-cell {
-    height: 9.8vw;
-    width: 9.8vw;
+    height: 9vw;
+    /*width: 9vw;*/
+    width: unset;
   }
 }
 .ms-cell {
