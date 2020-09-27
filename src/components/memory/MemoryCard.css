@@ -1,9 +1,4 @@
-.memory-card {
-  border: 1px solid black;
-  border-radius: 5px;
-  background-color: white;
-}
-.pink {
+/*.pink {
   background-color: #ff43d0;
 }
 .red {
@@ -26,7 +21,7 @@
 }
 .purple {
   background-color: #a800ff;
-}
+}*/
 
 .rm {
   background-image: url(../../images/RM.jpg);
@@ -62,4 +57,35 @@
 
 .image {
   background-size: cover;
+}
+
+.memory-card-scene {
+  perspective: 600px;
+}
+.memory-card-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transition: transform 1s;
+  transform-style: preserve-3d;
+}
+.flipped {
+  transform: rotateY(180deg);
+}
+.memory-card {
+  border: 1px solid black;
+  border-radius: 5px;
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden; /* Safari */
+}
+.back {
+  background-color: #ffffff;
+  background-image: url("data:image/svg+xml,%3Csvg width='40' height='12' viewBox='0 0 40 12' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 6.172L6.172 0h5.656L0 11.828V6.172zm40 5.656L28.172 0h5.656L40 6.172v5.656zM6.172 12l12-12h3.656l12 12h-5.656L20 3.828 11.828 12H6.172zm12 0L20 10.172 21.828 12h-3.656z' fill='%23d1daed' fill-opacity='0.68' fill-rule='evenodd'/%3E%3C/svg%3E");
+}
+
+.front {
+  transform: rotateY(180deg);
 }
